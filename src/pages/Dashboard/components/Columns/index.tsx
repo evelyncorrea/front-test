@@ -1,32 +1,45 @@
 
 import * as S from "./styles";
 import RegistrationCard from "../RegistrationCard";
+import { useRegisters } from "~/hooks/Registers";
+import { Register, Status } from "~/types/Registers";
+import { updateRegisterStatus } from "~/services/Registers";
 
 const allColumns = [
-  { status: 'REVIEW', title: "Pronto para revisar" },
-  { status: 'APPROVED', title: "Aprovado" },
-  { status: 'REPROVED', title: "Reprovado" },
+  { status: Status.REVIEW, title: "Pronto para revisar" },
+  { status: Status.APROVED, title: "Aprovado" },
+  { status: Status.REPROVED, title: "Reprovado" },
 ];
 
-type Props = {
-  registrations?: any[];
-};
-const Collumns = (props: Props) => {
+const Columns = () => {
+  const { data: registrations, updateColumnsData } = useRegisters();
+
+  const changeCandidateStatus = async(newStatus: Status, candidate: Register) => {
+    try {
+      await updateRegisterStatus(newStatus, candidate);
+      
+      await updateColumnsData();
+    } catch(error) {
+      console.error('There was an error updating candidate\'s status: ', error);
+    }
+  }
+
   return (
     <S.Container>
-      {allColumns.map((collum) => {
+      {allColumns.map((column) => {
         return (
-          <S.Column status={collum.status} key={collum.title}>
+          <S.Column status={column.status} key={column.title}>
             <>
-              <S.TitleColumn status={collum.status}>
-                {collum.title}
+              <S.TitleColumn status={column.status}>
+                {column.title}
               </S.TitleColumn>
               <S.CollumContent>
-                {props?.registrations?.map((registration) => {
+                {registrations[column.status]?.map((registration) => {
                   return (
                     <RegistrationCard
                       data={registration}
                       key={registration.id}
+                      changeStatus={changeCandidateStatus}
                     />
                   );
                 })}
@@ -38,4 +51,5 @@ const Collumns = (props: Props) => {
     </S.Container>
   );
 };
-export default Collumns;
+
+export default Columns;

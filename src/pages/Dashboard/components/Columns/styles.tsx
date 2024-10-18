@@ -1,16 +1,17 @@
 import styled from "styled-components";
+import { Status } from "~/types/Registers";
 const registrationStatusStyles: {
   [key in string]: { background: string; title: string };
 } = {
-  REVIEW: {
+  [Status.REVIEW]: {
     background: "#FDF8E9",
     title: "#EFC24D",
   },
-  APPROVED: {
+  [Status.APROVED]: {
     background: "#EEEEFD",
     title: "#4242DF",
   },
-  REPROVED: {
+  [Status.REPROVED]: {
     background: "#FBEDF6",
     title: "#CE2893",
   },

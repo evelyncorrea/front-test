@@ -1,0 +1,1 @@
+export { getRegisters } from './GetRegisters';
