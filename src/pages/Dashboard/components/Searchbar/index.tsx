@@ -22,6 +22,13 @@ export const SearchBar = () => {
     if(event.key === 'Enter') {
       const targetValue = (event.target as HTMLInputElement).value;
 
+      if(!targetValue) {
+        updateData();
+        setHasError(false);
+        
+        return;
+      }
+
       if(cpf.isValid(targetValue)) {
         searchDataByCpf(targetValue);
         setHasError(false);
