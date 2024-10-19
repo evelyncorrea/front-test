@@ -7,6 +7,8 @@ import {
   HiOutlineTrash,
 } from "react-icons/hi";
 import { Status } from "~/types/Registers";
+import { useState } from "react";
+import { ConfirmModal } from "~/components/ConfirmModal";
 
 type Props = {
   data: {
@@ -21,49 +23,67 @@ type Props = {
 };
 
 const RegistrationCard = (props: Props) => {
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [newStatus, setNewStatus] = useState<Status>();
+
   const isRegisterReproved = props.data.status === Status.REPROVED;
   const isRegisterAproved = props.data.status === Status.APROVED;
   const isRegisterReview = props.data.status === Status.REVIEW;
 
-  const changeCandidateStatus = async (newStatus: Status) => {
-    props.changeStatus(newStatus, props.data)
+  const changeCandidateStatus = (newStatus: Status) => {
+    setShowModal(true);
+    setNewStatus(newStatus);
   }
 
   return (
-    <S.Card>
-      <S.IconAndText>
-        <HiOutlineUser />
-        <h3>{props.data.employeeName}</h3>
-      </S.IconAndText>
-      <S.IconAndText>
-        <HiOutlineMail />
-        <p>{props.data.email}</p>
-      </S.IconAndText>
-      <S.IconAndText>
-        <HiOutlineCalendar />
-        <span>{props.data.admissionDate}</span>
-      </S.IconAndText>
-      <S.Actions>
-        {!isRegisterReproved && <ButtonSmall 
-          bgcolor="rgb(255, 145, 154)" 
-          onClick={() => changeCandidateStatus(Status.REPROVED)}
-        >
-          Reprovar
-        </ButtonSmall>}
-        {!isRegisterAproved && <ButtonSmall
-          bgcolor="rgb(155, 229, 155)"
-          onClick={() => changeCandidateStatus(Status.APROVED)}  
-        >
-          Aprovar
-        </ButtonSmall>}
-        {!isRegisterReview && <ButtonSmall bgcolor="#ff8858"
-          onClick={() => changeCandidateStatus(Status.REVIEW)}
-        >
-          Revisar novamente
-        </ButtonSmall>}
-        <HiOutlineTrash />
-      </S.Actions>
-    </S.Card>
+    <>
+    {showModal && 
+      <ConfirmModal 
+        confirmText={`Mover candidato para ${newStatus}?`}
+        confirmAction={() => props.changeStatus(newStatus, props.data)}
+        closeModal={() => setShowModal(false)}
+      />
+    }
+      <S.Card>
+        <S.IconAndText>
+          <HiOutlineUser />
+          <h3>{props.data.employeeName}</h3>
+        </S.IconAndText>
+        <S.IconAndText>
+          <HiOutlineMail />
+          <p>{props.data.email}</p>
+        </S.IconAndText>
+        <S.IconAndText>
+          <HiOutlineCalendar />
+          <span>{props.data.admissionDate}</span>
+        </S.IconAndText>
+        <S.Actions>
+          {isRegisterReview && 
+          <>
+            <ButtonSmall 
+              bgcolor="rgb(255, 145, 154)" 
+              onClick={() => changeCandidateStatus(Status.REPROVED)}
+            >
+              Reprovar
+            </ButtonSmall>
+            <ButtonSmall
+              bgcolor="rgb(155, 229, 155)"
+              onClick={() => changeCandidateStatus(Status.APROVED)}  
+            >
+              Aprovar
+            </ButtonSmall>
+          </>}
+          {(isRegisterAproved || isRegisterReproved) && 
+            <ButtonSmall bgcolor="#ff8858"
+              onClick={() => changeCandidateStatus(Status.REVIEW)}
+            >
+              Revisar novamente
+            </ButtonSmall>
+          }
+          <HiOutlineTrash />
+        </S.Actions>
+      </S.Card>
+    </>
   );
 };
 

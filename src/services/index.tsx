@@ -1,1 +1,0 @@
-export { getRegisters } from './GetRegisters';

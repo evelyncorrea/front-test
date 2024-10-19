@@ -1,14 +1,17 @@
 import Router from "~/router";
 import { Header } from "./components/Header";
+import { RegistersProvider } from "./contexts/Registers";
 
 function App() {
   return (
-    <>
-      <Header>
-        <h1>Caju Front Teste</h1>
-      </Header>
-      <Router />
-    </>
+    <RegistersProvider>
+      <>
+        <Header>
+          <h1>Caju Front Teste</h1>
+        </Header>
+        <Router />
+      </>
+    </RegistersProvider>
   );
 }
 

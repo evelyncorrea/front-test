@@ -13,3 +13,9 @@ export const Actions = styled.div`
   align-items: center;
   gap: 16px;
 `;
+
+export const ErrorText = styled.p`
+  color: red;
+  margin: 5px 0;
+  font-size: 12px;
+`

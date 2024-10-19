@@ -5,19 +5,41 @@ import { IconButton } from "~/components/Buttons/IconButton";
 import TextField from "~/components/TextField";
 import routes from "~/router/routes";
 import * as S from "./styles";
+import { cpf } from "cpf-cnpj-validator";
+import { useState } from "react";
+import useRegisters from "~/contexts/Registers";
+
 export const SearchBar = () => {
   const history = useHistory();
+  const { updateData, searchDataByCpf } = useRegisters();
+  const [hasError, setHasError] = useState(false);
 
   const goToNewAdmissionPage = () => {
     history.push(routes.newUser);
   };
+
+  const search = (event: KeyboardEvent) => {
+    if(event.key === 'Enter') {
+      const targetValue = (event.target as HTMLInputElement).value;
+
+      if(cpf.isValid(targetValue)) {
+        searchDataByCpf(targetValue);
+        setHasError(false);
+      } else {
+        setHasError(true);
+      }
+    }
+  }
   
   return (
     <S.Container>
-      <TextField  placeholder="Digite um CPF válido" />
+      <div>
+        <TextField placeholder="Digite um CPF válido" onKeyDown={(event) => search(event)} />
+        {hasError && <S.ErrorText>O CPF é inválido!</S.ErrorText>}
+      </div>
       <S.Actions>
         <IconButton aria-label="refetch">
-          <HiRefresh />
+          <HiRefresh onClick={() => updateData()} />
         </IconButton>
         <Button onClick={() => goToNewAdmissionPage()}>Nova Admissão</Button>
       </S.Actions>
