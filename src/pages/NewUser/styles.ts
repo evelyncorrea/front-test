@@ -28,3 +28,8 @@ export const Card = styled.div`
     align-self: flex-end;
   }
 `;
+
+export const ErrorMessage = styled.p`
+  font-size: 13px;
+  color: red;
+`;

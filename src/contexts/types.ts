@@ -14,6 +14,7 @@ export type InitialState = {
     updateData: Function
     searchDataByCpf: Function
     changeToasterVisibility: Function
+    postNewRegister: Function
 }
 
 export enum ActionTypes {

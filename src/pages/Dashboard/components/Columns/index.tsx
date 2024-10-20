@@ -1,7 +1,7 @@
 
 import * as S from "./styles";
 import RegistrationCard from "../RegistrationCard";
-import { Register, Status } from "~/types/Registers";
+import { Status } from "~/types/Registers";
 import useRegisters from "~/contexts/Registers";
 import { useEffect } from "react";
 
@@ -12,7 +12,7 @@ const allColumns = [
 ];
 
 const Columns = () => {
-  const { isLoading, data: registrations, updateData, updateStatus } = useRegisters();
+  const { data: registrations, updateData } = useRegisters();
 
   useEffect(() => {
     let ignore = false;
@@ -26,17 +26,8 @@ const Columns = () => {
     };
   }, [])
 
-  const changeCandidateStatus = async(newStatus: Status, candidate: Register) => {
-    try {
-      await updateStatus(newStatus, candidate);
-    } catch(error) {
-      console.error('There was an error updating candidate\'s status: ', error);
-    }
-  }
-
   return (
     <S.Container>
-      {isLoading && 'Loading...'}
       {allColumns.map((column) => {
         return (
           <S.Column status={column.status} key={column.title}>
@@ -50,7 +41,6 @@ const Columns = () => {
                     <RegistrationCard
                       data={registration}
                       key={registration.id}
-                      changeStatus={changeCandidateStatus}
                     />
                   );
                 })}

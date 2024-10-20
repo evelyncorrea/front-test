@@ -6,9 +6,10 @@ import {
   HiOutlineCalendar,
   HiOutlineTrash,
 } from "react-icons/hi";
-import { Status } from "~/types/Registers";
+import { Register, Status } from "~/types/Registers";
 import { useState } from "react";
 import { ConfirmModal } from "~/components/ConfirmModal";
+import useRegisters from "~/contexts/Registers";
 
 type Props = {
   data: {
@@ -19,20 +20,30 @@ type Props = {
     id: string
     status: Status
   }
-  changeStatus: Function
 };
 
 const RegistrationCard = (props: Props) => {
+  const { updateStatus } = useRegisters();
+
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [newStatus, setNewStatus] = useState<Status>();
+  const [newStatus, setNewStatus] = useState<Status>(Status.REVIEW);
 
   const isRegisterReproved = props.data.status === Status.REPROVED;
   const isRegisterAproved = props.data.status === Status.APROVED;
   const isRegisterReview = props.data.status === Status.REVIEW;
 
-  const changeCandidateStatus = (newStatus: Status) => {
-    setShowModal(true);
+  const changeStatusModal = (newStatus: Status) => {
     setNewStatus(newStatus);
+    setShowModal(true);
+  }
+
+  const changeCandidateStatus = async(newStatus: Status, candidate: Register) => {
+    try {
+      setShowModal(false);
+      await updateStatus(newStatus, candidate);
+    } catch(error) {
+      console.error('There was an error updating candidate\'s status: ', error);
+    }
   }
 
   return (
@@ -40,7 +51,7 @@ const RegistrationCard = (props: Props) => {
     {showModal && 
       <ConfirmModal 
         confirmText={`Mover candidato para ${newStatus}?`}
-        confirmAction={() => props.changeStatus(newStatus, props.data)}
+        confirmAction={() => changeCandidateStatus(newStatus, props.data)}
         closeModal={() => setShowModal(false)}
       />
     }
@@ -62,20 +73,20 @@ const RegistrationCard = (props: Props) => {
           <>
             <ButtonSmall 
               bgcolor="rgb(255, 145, 154)" 
-              onClick={() => changeCandidateStatus(Status.REPROVED)}
+              onClick={() => changeStatusModal(true)}
             >
               Reprovar
             </ButtonSmall>
             <ButtonSmall
               bgcolor="rgb(155, 229, 155)"
-              onClick={() => changeCandidateStatus(Status.APROVED)}  
+              onClick={() => changeStatusModal(Status.APROVED)}  
             >
               Aprovar
             </ButtonSmall>
           </>}
           {(isRegisterAproved || isRegisterReproved) && 
             <ButtonSmall bgcolor="#ff8858"
-              onClick={() => changeCandidateStatus(Status.REVIEW)}
+              onClick={() => changeStatusModal(Status.REVIEW)}
             >
               Revisar novamente
             </ButtonSmall>

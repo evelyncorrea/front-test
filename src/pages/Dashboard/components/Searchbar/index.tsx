@@ -5,43 +5,49 @@ import { IconButton } from "~/components/Buttons/IconButton";
 import TextField from "~/components/TextField";
 import routes from "~/router/routes";
 import * as S from "./styles";
-import { cpf } from "cpf-cnpj-validator";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import useRegisters from "~/contexts/Registers";
+import { cpfMask } from "~/utils/masks";
+import { cpfValidation } from "~/utils/formValidations";
 
 export const SearchBar = () => {
   const history = useHistory();
   const { updateData, searchDataByCpf } = useRegisters();
-  const [hasError, setHasError] = useState(false);
+  const [hasError, setHasError] = useState<boolean>(false);
+  const [currentValue, setCurrentValue] = useState<string>();
 
   const goToNewAdmissionPage = () => {
     history.push(routes.newUser);
   };
 
-  const search = (event: KeyboardEvent) => {
-    if(event.key === 'Enter') {
-      const targetValue = (event.target as HTMLInputElement).value;
+  const search = (event: ChangeEvent) => {
+    const targetValue = (event.target as HTMLInputElement).value;
+    setCurrentValue(cpfMask(targetValue));
 
-      if(!targetValue) {
-        updateData();
-        setHasError(false);
-        
-        return;
-      }
+    if(!targetValue) {
+      updateData();
+      setHasError(false);
 
-      if(cpf.isValid(targetValue)) {
-        searchDataByCpf(targetValue);
-        setHasError(false);
-      } else {
-        setHasError(true);
-      }
+      return;
+    }
+
+    if(cpfValidation(targetValue)) {
+      searchDataByCpf(targetValue);
+      setHasError(false);
+    } else {
+      setHasError(true);
     }
   }
   
   return (
     <S.Container>
       <div>
-        <TextField placeholder="Digite um CPF válido" onKeyDown={(event) => search(event)} />
+        <TextField 
+          value={currentValue} 
+          placeholder="Digite um CPF válido"
+          maxLength={14}
+          onChange={(event) => search(event)}
+        />
         {hasError && <S.ErrorText>O CPF é inválido!</S.ErrorText>}
       </div>
       <S.Actions>

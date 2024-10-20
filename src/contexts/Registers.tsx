@@ -1,7 +1,7 @@
 import { createContext, useContext, useReducer } from "react";
 import { ActionTypes, InitialState, ProviderProps } from "./types";
 import { AllRegisters, Register, Status } from "~/types/Registers";
-import { getRegisters, getRegistersByCpf, updateRegisterStatus } from "~/services";
+import { createNewRegister, getRegisters, getRegistersByCpf, updateRegisterStatus } from "~/services";
 
 const initialAllRegistersData: AllRegisters = {
     [Status.APROVED]: [],
@@ -17,7 +17,8 @@ const initialData: InitialState = {
     updateData: () => {},
     updateStatus: () => {},
     searchDataByCpf: () => {},
-    changeToasterVisibility: () => {}
+    changeToasterVisibility: () => {},
+    postNewRegister: () => {}
 }
 
 const RegistersContext = createContext(initialData);
@@ -70,12 +71,14 @@ export const RegistersProvider = ({ children }: ProviderProps): JSX.Element => {
                     };
                 });
 
-                dispatch({ type: ActionTypes.CHANGE_DATA, payload: { data: newData } });
+                setTimeout(() => {
+                    dispatch({ type: ActionTypes.CHANGE_DATA, payload: { data: newData } });
+                }, 500);
             });
     }
 
     const searchDataByCpf = async (cpf: string) => {
-        dispatch({ type: ActionTypes.SET_LOADING, payload: true })
+        dispatch({ type: ActionTypes.SET_LOADING, payload: true });
 
         getRegistersByCpf(cpf)
             .then(res => res.json())
@@ -91,16 +94,20 @@ export const RegistersProvider = ({ children }: ProviderProps): JSX.Element => {
                     };
                 })
 
-                dispatch({ type: ActionTypes.CHANGE_DATA, payload: { data: newData }})
+                setTimeout(() => {
+                    dispatch({ type: ActionTypes.CHANGE_DATA, payload: { data: newData }});
+                }, 500);
             })
     }
 
     const updateStatus = (newStatus: Status, register: Register) => {
-        dispatch({ type: ActionTypes.SET_LOADING, payload: true })
+        dispatch({ type: ActionTypes.SET_LOADING, payload: true });
 
         updateRegisterStatus(newStatus, register).then(() => {
             updateData();
-            changeToasterVisibility(true, `Usuário movido para ${newStatus} com sucesso`);
+            setTimeout(() => {
+                changeToasterVisibility(true, `Usuário movido para ${newStatus} com sucesso`);
+            }, 500)
         }).catch(error => {
             changeToasterVisibility(true, `Ocorreu um erro! Tente novamente`);
             console.error('Erro ao mover usuário: ', error);
@@ -111,12 +118,28 @@ export const RegistersProvider = ({ children }: ProviderProps): JSX.Element => {
         dispatch({ type: ActionTypes.CHANGE_TOASTER_VISIBILITY, payload: {visibility: newValue, message } });
     }
 
+    const postNewRegister = (newRegister: Register) => {
+        dispatch({ type: ActionTypes.SET_LOADING, payload: true });
+
+        createNewRegister(newRegister).then(() => {
+            dispatch({ type: ActionTypes.SET_LOADING, payload: false });
+
+            setTimeout(() => {
+                dispatch({ 
+                    type: ActionTypes.CHANGE_TOASTER_VISIBILITY, 
+                    payload: { visibility: true, message: 'Registro criado com sucesso!'}
+                });
+            }, 500);
+        })
+    }
+
     const value = {
         ...state,
         updateData,
         searchDataByCpf,
         updateStatus,
-        changeToasterVisibility
+        changeToasterVisibility,
+        postNewRegister
     }
     
     return <RegistersContext.Provider value={value}>{ children }</RegistersContext.Provider>
