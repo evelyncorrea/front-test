@@ -23,6 +23,7 @@ export const Modal = styled.div`
     margin: 15% 25%;
     background-color: whitesmoke;
     border-radius: 15px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 `;
 
 export const ModalTitle = styled.h2`

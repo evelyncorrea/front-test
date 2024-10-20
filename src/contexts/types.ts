@@ -8,12 +8,16 @@ export type ProviderProps = {
 export type InitialState = {
     data: AllRegisters
     isLoading: boolean
+    showToaster: boolean
+    toasterValue: string
     updateStatus: Function
     updateData: Function
     searchDataByCpf: Function
+    changeToasterVisibility: Function
 }
 
 export enum ActionTypes {
     CHANGE_DATA = 'CHANGE_DATA',
-    SET_LOADING = 'SET_LOADING'
+    SET_LOADING = 'SET_LOADING',
+    CHANGE_TOASTER_VISIBILITY = 'CHANGE_TOASTER_VISIBILITY'
 }

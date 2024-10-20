@@ -12,9 +12,12 @@ const initialAllRegistersData: AllRegisters = {
 const initialData: InitialState = {
     data: initialAllRegistersData,
     isLoading: false,
+    showToaster: false,
+    toasterValue: "",
     updateData: () => {},
     updateStatus: () => {},
-    searchDataByCpf: () => {}
+    searchDataByCpf: () => {},
+    changeToasterVisibility: () => {}
 }
 
 const RegistersContext = createContext(initialData);
@@ -34,6 +37,14 @@ const RegistersReducer = (state: InitialState, action: { type: ActionTypes, payl
         return {
             ...state,
             isLoading: payload
+        }
+    }
+
+    if(type === ActionTypes.CHANGE_TOASTER_VISIBILITY) {
+        return {
+            ...state,
+            showToaster: payload.visibility,
+            toasterValue: payload.message
         }
     }
 
@@ -86,10 +97,18 @@ export const RegistersProvider = ({ children }: ProviderProps): JSX.Element => {
 
     const updateStatus = (newStatus: Status, register: Register) => {
         dispatch({ type: ActionTypes.SET_LOADING, payload: true })
-        
+
         updateRegisterStatus(newStatus, register).then(() => {
             updateData();
-        });
+            changeToasterVisibility(true, `Usuário movido para ${newStatus} com sucesso`);
+        }).catch(error => {
+            changeToasterVisibility(true, `Ocorreu um erro! Tente novamente`);
+            console.error('Erro ao mover usuário: ', error);
+        })
+    }
+
+    const changeToasterVisibility = (newValue: boolean, message?: string) => {
+        dispatch({ type: ActionTypes.CHANGE_TOASTER_VISIBILITY, payload: {visibility: newValue, message } });
     }
 
     const value = {
@@ -97,6 +116,7 @@ export const RegistersProvider = ({ children }: ProviderProps): JSX.Element => {
         updateData,
         searchDataByCpf,
         updateStatus,
+        changeToasterVisibility
     }
     
     return <RegistersContext.Provider value={value}>{ children }</RegistersContext.Provider>
