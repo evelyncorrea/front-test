@@ -28,7 +28,7 @@ export const cpfValidation = (data: string) => {
 }
 
 export const validations: { [key: string]: Function } = {
-    name: nameValidation,
+    employeeName: nameValidation,
     email: emailValidation,
     cpf: cpfValidation
   };

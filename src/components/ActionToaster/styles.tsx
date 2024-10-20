@@ -9,6 +9,7 @@ export const ToasterWrapper = styled.div`
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     display: flex;
     align-items: center;
+    z-index: 100;
 `;
 
 export const CloseButton = styled.button`

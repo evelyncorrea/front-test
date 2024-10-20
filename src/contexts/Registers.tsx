@@ -1,7 +1,7 @@
 import { createContext, useContext, useReducer } from "react";
 import { ActionTypes, InitialState, ProviderProps } from "./types";
 import { AllRegisters, Register, Status } from "~/types/Registers";
-import { createNewRegister, getRegisters, getRegistersByCpf, updateRegisterStatus } from "~/services";
+import { createNewRegister, getRegisters, getRegistersByCpf, updateRegisterStatus, deleteRegister } from "~/services";
 
 const initialAllRegistersData: AllRegisters = {
     [Status.APROVED]: [],
@@ -18,7 +18,8 @@ const initialData: InitialState = {
     updateStatus: () => {},
     searchDataByCpf: () => {},
     changeToasterVisibility: () => {},
-    postNewRegister: () => {}
+    postNewRegister: () => {},
+    eraseRegister: () => {}
 }
 
 const RegistersContext = createContext(initialData);
@@ -100,7 +101,7 @@ export const RegistersProvider = ({ children }: ProviderProps): JSX.Element => {
             })
     }
 
-    const updateStatus = (newStatus: Status, register: Register) => {
+    const updateStatus = async (newStatus: Status, register: Register) => {
         dispatch({ type: ActionTypes.SET_LOADING, payload: true });
 
         updateRegisterStatus(newStatus, register).then(() => {
@@ -118,7 +119,7 @@ export const RegistersProvider = ({ children }: ProviderProps): JSX.Element => {
         dispatch({ type: ActionTypes.CHANGE_TOASTER_VISIBILITY, payload: {visibility: newValue, message } });
     }
 
-    const postNewRegister = (newRegister: Register) => {
+    const postNewRegister = async (newRegister: Register) => {
         dispatch({ type: ActionTypes.SET_LOADING, payload: true });
 
         createNewRegister(newRegister).then(() => {
@@ -133,13 +134,28 @@ export const RegistersProvider = ({ children }: ProviderProps): JSX.Element => {
         })
     }
 
+    const eraseRegister = async (registerId: string) => {
+        dispatch({ type: ActionTypes.SET_LOADING, payload: true });
+
+        deleteRegister(registerId).then(() => {
+            updateData();
+            setTimeout(() => {
+                dispatch({ 
+                    type: ActionTypes.CHANGE_TOASTER_VISIBILITY, 
+                    payload: { visibility: true, message: 'Registro deletado com sucesso!'}
+                });
+            }, 500);
+        })
+    }
+
     const value = {
         ...state,
         updateData,
         searchDataByCpf,
         updateStatus,
         changeToasterVisibility,
-        postNewRegister
+        postNewRegister,
+        eraseRegister
     }
     
     return <RegistersContext.Provider value={value}>{ children }</RegistersContext.Provider>

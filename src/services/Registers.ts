@@ -17,12 +17,16 @@ export const updateRegisterStatus = async(newStatus: Status, register: Register)
             ...register,
             status: newStatus
         })
-    })
+    });
 }
 
 export const createNewRegister = async(newRegister: Register) => {
     return await fetch(baseURL, {
         method: 'POST',
         body: JSON.stringify(newRegister)
-    })
+    });
+}
+
+export const deleteRegister = async(registerId: string) => {
+    return await fetch(`${baseURL}/${registerId}`, { method: 'DELETE' });
 }
